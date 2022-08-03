@@ -1,15 +1,16 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
+
 const User = require('../models/User');
 
 const router = express.Router();
 
-//public route
-//sign up
+// public route
+// sign up
 router.post('/', (req, res) => {
   User.findOne({ handle: req.body.handle }).then((user) => {
-    if (user) {
-      res.status(400).json({ error: 'user already exists' });
-    }
+    if (user) return res.status(400).json({ error: 'user already exists' });
+
     const newUser = new User({
       firstName: req.body.firstName,
       lastName: req.body.lastName,
@@ -18,139 +19,164 @@ router.post('/', (req, res) => {
       followers: [],
       following: []
     });
-    newUser
-      .save()
-      .then((user) => res.json(user))
-      .catch((err) => console.log(err));
+
+    // Hashing the password
+    bcrypt.genSalt(10, (err, salt) => {
+      if (err) throw err;
+      bcrypt.hash(newUser.password, salt, (error, hash) => {
+        if (error) throw error;
+        newUser.password = hash;
+
+        newUser
+          .save()
+          .then((userObj) => res.json(userObj))
+          .catch((userErr) => res.json(userErr));
+      });
+    });
   });
 });
 
+// test route
+// get all users
 router.get('/all', async (req, res) => {
   const users = await User.find();
   res.send(users);
 });
 
-//public route
-//sign in
+// public route
+// sign in
 router.post('/sign-in', (req, res) => {
-  //check if the user exists
+  // check if the user exists
   User.findOne({ handle: req.body.handle }).then((user) => {
     if (!user) return res.json({ error: 'User not found' });
-
-    //compare the password using bcrypt
-    // return response
+    // Comparing the password
+    bcrypt.compare(req.body.password, user.password).then((isMatched) => {
+      if (isMatched) {
+        res.json({ success: true, msg: 'login successful' });
+      } else {
+        res.json({ error: 'password incorrect' });
+      }
+    });
   });
 });
 
-//this is a protected route
-//follow a user
+// this is a protected route
+// follow a user
 router.patch('/follow-user/:id', (req, res) => {
   User.findOne({ _id: req.params.id })
-    .then((user) => {
-      if (!user) return res.json({ error: 'User not found' });
+    .then((userToFollow) => {
+      if (!userToFollow) return res.json({ error: 'User not found' });
       User.findOne({ _id: req.body.id }).then((user) => {
+        if (user.following.includes(req.params.id))
+          return res.json({ err: 'User already followed' });
         user.following.push(req.params.id);
         user
           .save()
-          .then((user) => {
-            console.log('following done');
+          .then(() => {
+            User.findOne({ _id: req.params.id }).then((user) => {
+              user.followers.push(req.body.id);
+              user
+                .save()
+                .then(() => {
+                  res.json({
+                    success: true,
+                    msg: 'User followed successfully'
+                  });
+                })
+                .catch((err) => {
+                  res.json({ err });
+                });
+            });
           })
           .catch((err) => {
-            console.log('following not done.');
+            res.json({ err });
           });
       });
-      User.findOne({ _id: req.params.id }).then((user) => {
-        user.followers.push(req.body.id);
-        user
-          .save()
-          .then((user) => {
-            console.log('followers done');
-          })
-          .catch((err) => {
-            console.log('followers not done.');
-          });
-      });
-      res.json();
     })
     .catch((err) => {
       res.json(err);
     });
 });
 
-//this is a protected route
-//unfollow a user
+// this is a protected route
+// unfollow a user
 router.patch('/unfollow-user/:id', (req, res) => {
   User.findOne({ _id: req.params.id })
-    .then((user) => {
-      if (!user) return res.json({ error: 'User not found' });
+    .then((userToUnfollow) => {
+      if (!userToUnfollow) res.json({ error: 'User not found' });
       User.findOne({ _id: req.body.id }).then((user) => {
-        const indexToRemove = user.following.findIndex(
+        const indexOfUserFollowing = user.following.findIndex(
           (id) => id === req.params.id
         );
-        user.following.splice(indexToRemove, 1);
+        if (indexOfUserFollowing === -1)
+          return res.json({ err: 'User not followed' });
+        user.following.splice(indexOfUserFollowing, 1);
         user
           .save()
-          .then((user) => {
-            console.log('following done');
+          .then(() => {
+            User.findOne({ _id: req.params.id }).then((user) => {
+              const indexToRemove = user.followers.findIndex(
+                (id) => id === req.body.id
+              );
+              user.followers.splice(indexToRemove, 1);
+              user
+                .save()
+                .then(() => {
+                  res.json({
+                    success: true,
+                    msg: 'User unfollowed successfully'
+                  });
+                })
+                .catch((err) => {
+                  res.json({ err });
+                });
+            });
           })
           .catch((err) => {
-            console.log('following not done.');
+            res.json({ err });
           });
       });
-      User.findOne({ _id: req.params.id }).then((user) => {
-        const indexToRemove = user.followers.findIndex(
-          (id) => id === req.body.id
-        );
-        user.followers.splice(indexToRemove, 1);
-        user
-          .save()
-          .then((user) => {
-            console.log('followers done');
-          })
-          .catch((err) => {
-            console.log('followers not done.');
-          });
-      });
-      res.json();
     })
     .catch((err) => {
       res.json(err);
     });
 });
 
-//protected route
-//update user
+// protected route
+// update user
 router.patch('/update', (req, res) => {
-  const user = User.findOne({ handle: req.body.handle }).then((user) => {
-    if (!user) return res.json({ error: 'User not found' });
-    (user.firstName = req.body.firstName ? req.body.firstName : user.firstName),
-      (user.lastName = req.body.lastName ? req.body.lastName : user.lastName),
-      (user.handle = req.body.handle ? req.body.handle : user.handle);
-    //TODO : password with hash
-  });
-  user
-    .save()
+  User.findOne({ handle: req.body.handle })
     .then((user) => {
-      res.json({ success: true, msg: 'User updated successfully' });
+      if (!user) res.json({ error: 'User not found' });
+      user.firstName = req.body.firstName ? req.body.firstName : user.firstName;
+      user.lastName = req.body.lastName ? req.body.lastName : user.lastName;
+      user.handle = req.body.handle ? req.body.handle : user.handle;
+      // TODO : password with hash
+      user
+        .save()
+        .then(() =>
+          res.json({
+            success: true,
+            msg: 'User updated successfully'
+          })
+        )
+        .catch((err) => {
+          res.json(err);
+        });
     })
-    .catch((err) => {
-      res.json(err);
-    });
+    .catch(() => {});
 });
-//protected route
-//delete a user
+
+// protected route
+// delete a user
 router.delete('/delete-user', (req, res) => {
   User.findOneAndDelete({ handle: req.body.handle }).then((user) => {
     if (!user) return res.json({ error: 'User does not exist' });
-    res.json({ success: true, msg: 'User deleted successfully' });
+    return res.json({
+      success: true,
+      msg: 'User deleted successfully'
+    });
   });
 });
 
 module.exports = router;
-
-// sign up / create x
-// sign in o
-// update user x
-// delete user x
-// follow user x
-// unfollow user x
