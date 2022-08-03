@@ -1,5 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const authenticate = require('../middleware/jwtAuth');
 
 const User = require('../models/User');
 
@@ -52,7 +54,12 @@ router.post('/sign-in', (req, res) => {
     // Comparing the password
     bcrypt.compare(req.body.password, user.password).then((isMatched) => {
       if (isMatched) {
-        res.json({ success: true, msg: 'login successful' });
+        const token = jwt.sign(
+          { id: user.id },
+          process.env.SECRET_OR_PRIVATE_KEY,
+          { expiresIn: '24h' }
+        );
+        res.json({ success: true, msg: 'login successful', user, token });
       } else {
         res.json({ error: 'password incorrect' });
       }
@@ -62,7 +69,7 @@ router.post('/sign-in', (req, res) => {
 
 // this is a protected route
 // follow a user
-router.patch('/follow-user/:id', (req, res) => {
+router.patch('/follow-user/:id', authenticate, (req, res) => {
   User.findOne({ _id: req.params.id })
     .then((userToFollow) => {
       if (!userToFollow) return res.json({ error: 'User not found' });
@@ -100,7 +107,7 @@ router.patch('/follow-user/:id', (req, res) => {
 
 // this is a protected route
 // unfollow a user
-router.patch('/unfollow-user/:id', (req, res) => {
+router.patch('/unfollow-user/:id', authenticate, (req, res) => {
   User.findOne({ _id: req.params.id })
     .then((userToUnfollow) => {
       if (!userToUnfollow) res.json({ error: 'User not found' });
