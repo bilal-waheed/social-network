@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const { init } = require('./socket');
 require('dotenv').config();
 
 // router imports
@@ -23,6 +24,10 @@ mongoose.connect(process.env.MONGO_URI, (err) => {
   else console.log('Connected to DB successfully');
 });
 
-app.listen(process.env.PORT, () => {
+const server = app.listen(process.env.PORT, () => {
   console.log('server running on port 3000');
+  const io = init(server);
+  io.on('connection', () => {
+    console.log('client connected');
+  });
 });

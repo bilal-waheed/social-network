@@ -1,11 +1,14 @@
 const express = require('express');
 
 const authenticate = require('../middleware/jwtAuth');
+const io = require('../socket');
 
 const Post = require('../models/Post');
 const User = require('../models/User');
 
 const router = express.Router();
+
+const PER_PAGE_ITEMS = 2;
 
 // test route
 router.get('/all', (req, res) => {
@@ -29,6 +32,7 @@ router.post('/create', (req, res) => {
   newPost
     .save()
     .then((post) => {
+      io.getIO().emit('posts', { message: 'New post created', post });
       res.status(200).json({ success: true, post });
     })
     .catch((err) => {
@@ -36,11 +40,30 @@ router.post('/create', (req, res) => {
     });
 });
 
+// pagination test
+// router.get('/page', (req, res) => {
+//   const { page } = req.body;
+//   let totalPosts;
+//   Post.find()
+//     .count()
+//     .then((count) => {
+//       totalPosts = count;
+//       return Post.find()
+//         .skip((page - 1) * PER_PAGE_ITEMS)
+//         .limit(PER_PAGE_ITEMS)
+//         .then((posts) => {
+//           res.json(posts);
+//         });
+//     });
+// });
+
 // protected route
-// get all posts
+// get the feed
 router.get('/feed', async (req, res) => {
-  const { param, order } = req.body;
+  const { param, order, pageNumber } = req.body;
   const userHandle = req.body.handle;
+  let postsCount;
+  console.log(pageNumber);
 
   const orderSort = {};
   orderSort[param] = order;
@@ -49,13 +72,27 @@ router.get('/feed', async (req, res) => {
   const { following } = user;
 
   Post.find({ createdBy: { $in: following } })
-    .sort(orderSort)
-    .then((posts) => {
-      if (!posts) return res.status(404).send('No posts found');
-      res.status(200).json({ success: 'true', posts });
-    })
-    .catch((err) => {
-      res.json(err);
+    .count()
+    .then((count) => {
+      postsCount = count;
+      Post.find({ createdBy: { $in: following } })
+        .sort(orderSort)
+        .skip((pageNumber - 1) * PER_PAGE_ITEMS)
+        .limit(PER_PAGE_ITEMS)
+        .then((posts) => {
+          if (!posts) return res.status(404).send('No posts found');
+          res.status(200).json({
+            success: true,
+            posts,
+            totalPosts: postsCount,
+            nextPage: parseInt(pageNumber, 10) + 1,
+            hasNextPage: pageNumber * PER_PAGE_ITEMS < postsCount,
+            hasPrevPage: pageNumber > 1
+          });
+        })
+        .catch((err) => {
+          res.json(err);
+        });
     });
 });
 
@@ -72,13 +109,14 @@ router.patch('/update', (req, res) => {
 
       post
         .save()
-        .then((updatedPost) =>
+        .then((updatedPost) => {
+          io.getIO().emit('posts', { message: 'A post updated', updatedPost });
           res.json({
             success: true,
             msg: 'Post updated successfully',
             updatedPost
-          })
-        )
+          });
+        })
         .catch((err) => {
           res.json(err);
         });
