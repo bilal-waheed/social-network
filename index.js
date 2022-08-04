@@ -5,6 +5,7 @@ require('dotenv').config();
 
 // router imports
 const userRouter = require('./routes/users');
+const postRouter = require('./routes/posts');
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(bodyParser.json());
 
 // router middlewares
 app.use('/api/users', userRouter);
+app.use('/api/posts', postRouter);
 
 // mongoDB connection
 mongoose.connect(process.env.MONGO_URI, (err) => {

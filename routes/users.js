@@ -158,7 +158,7 @@ router.patch('/update', (req, res) => {
       user.firstName = req.body.firstName ? req.body.firstName : user.firstName;
       user.lastName = req.body.lastName ? req.body.lastName : user.lastName;
       user.handle = req.body.handle ? req.body.handle : user.handle;
-      // TODO : password with hash
+
       user
         .save()
         .then(() =>
