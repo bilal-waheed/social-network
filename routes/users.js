@@ -4,20 +4,35 @@ const jwt = require('jsonwebtoken');
 const authenticate = require('../middleware/jwtAuth');
 
 const User = require('../models/User');
+const Post = require('../models/Post');
+
+const { validateSignUpData, validateLoginData } = require('../validation/joi');
 
 const router = express.Router();
 
 // public route
 // sign up
-router.post('/', (req, res) => {
-  User.findOne({ handle: req.body.handle }).then((user) => {
+router.post('/signup', (req, res) => {
+  User.findOne({ username: req.body.username }).then((user) => {
     if (user) return res.status(400).json({ error: 'user already exists' });
 
+    const { firstName, lastName, username, email, password } = req.body;
+
+    const { value, error } = validateSignUpData({
+      firstName,
+      lastName,
+      username,
+      email,
+      password
+    });
+    if (error) return res.status(400).json(error.details[0].message);
+
     const newUser = new User({
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      handle: req.body.handle,
-      password: req.body.password,
+      firstName,
+      lastName,
+      username,
+      email,
+      password,
       followers: [],
       following: []
     });
@@ -25,46 +40,141 @@ router.post('/', (req, res) => {
     // Hashing the password
     bcrypt.genSalt(10, (err, salt) => {
       if (err) throw err;
-      bcrypt.hash(newUser.password, salt, (error, hash) => {
+      bcrypt.hash(password, salt, (error, hash) => {
         if (error) throw error;
         newUser.password = hash;
 
         newUser
           .save()
-          .then((userObj) => res.json(userObj))
-          .catch((userErr) => res.json(userErr));
+          .then((userObj) => {
+            const token = jwt.sign(
+              { id: userObj.id },
+              process.env.SECRET_OR_PRIVATE_KEY,
+              { expiresIn: '24h' }
+            );
+            res.status(201).json({
+              success: true,
+              msg: 'sign up successful',
+              userObj,
+              token
+            });
+          })
+          .catch((userErr) => res.status(500).json(userErr));
       });
     });
   });
 });
 
-// test route
-// get all users
-router.get('/all', async (req, res) => {
-  const users = await User.find();
-  res.send(users);
-});
-
 // public route
-// sign in
-router.post('/sign-in', (req, res) => {
+// log in
+router.post('/login', (req, res) => {
   // check if the user exists
-  User.findOne({ handle: req.body.handle }).then((user) => {
-    if (!user) return res.json({ error: 'User not found' });
+  User.findOne({ username: req.body.username }).then((user) => {
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const { username, password } = req.body;
+
+    const { value, error } = validateLoginData({ username, password });
+    if (error) return res.status(400).json(error.details[0].message);
+
     // Comparing the password
-    bcrypt.compare(req.body.password, user.password).then((isMatched) => {
+    bcrypt.compare(password, user.password).then((isMatched) => {
       if (isMatched) {
         const token = jwt.sign(
           { id: user.id },
           process.env.SECRET_OR_PRIVATE_KEY,
           { expiresIn: '24h' }
         );
-        res.json({ success: true, msg: 'login successful', user, token });
+        res
+          .status(200)
+          .json({ success: true, msg: 'login successful', user, token });
       } else {
-        res.json({ error: 'password incorrect' });
+        res.status(400).json({ error: 'password incorrect' });
       }
     });
   });
+});
+
+// protected route
+// update user
+router.patch('/update/:id', authenticate, (req, res) => {
+  User.findOne({ _id: req.user.id })
+    .then((user) => {
+      if (!user)
+        return res
+          .status(404)
+          .json({ error: 'User not found! Id is required' });
+
+      console.log(user.id, req.user.id);
+      if (user.id !== req.user.id)
+        return res.status(401).json({
+          error: 'Unauthorized.'
+        });
+
+      const { value, error } = validateSignUpData(req.body);
+
+      if (error) return res.status(400).json(error.details[0].message);
+
+      user.firstName = value.firstName ? value.firstName : user.firstName;
+      user.lastName = value.lastName ? value.lastName : user.lastName;
+      user.username = value.username ? value.username : user.username;
+      user.email = value.email ? value.email : user.email;
+
+      // re creating a hash for updated password
+      if (value.password) {
+        bcrypt.genSalt(10, (err, salt) => {
+          if (err) throw err;
+          bcrypt.hash(value.password, salt, (error, hash) => {
+            if (error) throw error;
+            user.password = hash;
+          });
+        });
+      }
+
+      user
+        .save()
+        .then((updatedUser) =>
+          res.status(200).json({
+            success: true,
+            msg: 'User updated successfully',
+            user: updatedUser
+          })
+        )
+        .catch((err) => {
+          res.json({ error: err });
+        });
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err });
+    });
+});
+
+// protected route
+// delete a user
+router.delete('/delete/:id', authenticate, (req, res) => {
+  User.findOneAndDelete({ _id: req.user.id })
+    .then(async (user) => {
+      if (!user) return res.status(404).json({ error: 'User does not exist' });
+
+      if (user.id !== req.user.id)
+        return res.status(401).json({
+          error: 'Unauthorized.'
+        });
+
+      try {
+        const result = await Post.deleteMany({ createdBy: req.user.id });
+
+        return res.status(200).json({
+          success: true,
+          msg: 'User deleted successfully'
+        });
+      } catch (err) {
+        throw new Error(err);
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err });
+    });
 });
 
 // this is a protected route
@@ -72,36 +182,39 @@ router.post('/sign-in', (req, res) => {
 router.patch('/follow-user/:id', authenticate, (req, res) => {
   User.findOne({ _id: req.params.id })
     .then((userToFollow) => {
-      if (!userToFollow) return res.json({ error: 'User not found' });
-      User.findOne({ _id: req.body.id }).then((user) => {
+      if (!userToFollow)
+        return res.status(404).json({ error: 'User not found' });
+
+      User.findOne({ _id: req.user.id }).then((user) => {
         if (user.following.includes(req.params.id))
-          return res.json({ err: 'User already followed' });
+          return res.json({ error: 'User already followed' });
+
         user.following.push(req.params.id);
         user
           .save()
           .then(() => {
             User.findOne({ _id: req.params.id }).then((user) => {
-              user.followers.push(req.body.id);
+              user.followers.push(req.user.id);
               user
                 .save()
                 .then(() => {
-                  res.json({
+                  res.status(200).json({
                     success: true,
                     msg: 'User followed successfully'
                   });
                 })
                 .catch((err) => {
-                  res.json({ err });
+                  res.status(500).json({ err });
                 });
             });
           })
           .catch((err) => {
-            res.json({ err });
+            res.status(500).json({ err });
           });
       });
     })
     .catch((err) => {
-      res.json(err);
+      res.status(500).json(err);
     });
 });
 
@@ -110,80 +223,46 @@ router.patch('/follow-user/:id', authenticate, (req, res) => {
 router.patch('/unfollow-user/:id', authenticate, (req, res) => {
   User.findOne({ _id: req.params.id })
     .then((userToUnfollow) => {
-      if (!userToUnfollow) res.json({ error: 'User not found' });
-      User.findOne({ _id: req.body.id }).then((user) => {
+      if (!userToUnfollow) res.status(404).json({ error: 'User not found' });
+
+      User.findOne({ _id: req.user.id }).then((user) => {
         const indexOfUserFollowing = user.following.findIndex(
           (id) => id === req.params.id
         );
+
         if (indexOfUserFollowing === -1)
-          return res.json({ err: 'User not followed' });
+          return res.status(404).json({ error: 'User not followed' });
+
         user.following.splice(indexOfUserFollowing, 1);
         user
           .save()
           .then(() => {
             User.findOne({ _id: req.params.id }).then((user) => {
               const indexToRemove = user.followers.findIndex(
-                (id) => id === req.body.id
+                (id) => id === req.user.id
               );
               user.followers.splice(indexToRemove, 1);
               user
                 .save()
                 .then(() => {
-                  res.json({
+                  res.status(200).json({
                     success: true,
                     msg: 'User unfollowed successfully'
                   });
                 })
                 .catch((err) => {
-                  res.json({ err });
+                  res.status(500).json({ error: err });
                 });
             });
           })
           .catch((err) => {
-            res.json({ err });
+            res.status(500).json({ error: err });
           });
       });
     })
     .catch((err) => {
       res.json(err);
     });
-});
-
-// protected route
-// update user
-router.patch('/update', (req, res) => {
-  User.findOne({ handle: req.body.handle })
-    .then((user) => {
-      if (!user) res.json({ error: 'User not found' });
-      user.firstName = req.body.firstName ? req.body.firstName : user.firstName;
-      user.lastName = req.body.lastName ? req.body.lastName : user.lastName;
-      user.handle = req.body.handle ? req.body.handle : user.handle;
-
-      user
-        .save()
-        .then(() =>
-          res.json({
-            success: true,
-            msg: 'User updated successfully'
-          })
-        )
-        .catch((err) => {
-          res.json(err);
-        });
-    })
-    .catch(() => {});
-});
-
-// protected route
-// delete a user
-router.delete('/delete-user', (req, res) => {
-  User.findOneAndDelete({ handle: req.body.handle }).then((user) => {
-    if (!user) return res.json({ error: 'User does not exist' });
-    return res.json({
-      success: true,
-      msg: 'User deleted successfully'
-    });
-  });
 });
 
 module.exports = router;

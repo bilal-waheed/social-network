@@ -9,6 +9,7 @@
     "spaced-comment": "warn",
     "consistent-return": "warn",
     "no-param-reassign": "off",
-    "no-console": "off"
+    "no-console": "warn",
+    "no-underscore-dangle": "off"
   }
 }
