@@ -7,6 +7,7 @@ require('dotenv').config();
 // router imports
 const userRouter = require('./routes/users');
 const postRouter = require('./routes/posts');
+const paymentRouter = require('./routes/checkout');
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(bodyParser.json());
 // router middlewares
 app.use('/api/users', userRouter);
 app.use('/api/posts', postRouter);
+app.use('/', paymentRouter);
 
 // mongoDB connection
 mongoose.connect(process.env.MONGO_URI, (err) => {

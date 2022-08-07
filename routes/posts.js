@@ -1,4 +1,5 @@
 const express = require('express');
+const sessionStorage = require('sessionstorage');
 
 const authenticate = require('../middleware/jwtAuth');
 const io = require('../socket');
@@ -84,6 +85,12 @@ router.get('/feed', authenticate, async (req, res) => {
   orderSort[param] = order;
 
   const user = await User.findOne({ _id: userId });
+  if (sessionStorage.getItem('user-type') === 'unpaid')
+    return res
+      .status(401)
+      .send(
+        'Buy the subscription to view the feed. Go to {DOMAIN_NAME}/checkout'
+      );
   const { following } = user;
 
   Post.find({ createdBy: { $in: following } })

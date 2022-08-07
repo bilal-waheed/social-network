@@ -1,6 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const sessionStorage = require('sessionstorage');
 const authenticate = require('../middleware/jwtAuth');
 
 const User = require('../models/User');
@@ -34,7 +35,8 @@ router.post('/signup', (req, res) => {
       email,
       password,
       followers: [],
-      following: []
+      following: [],
+      type: 'unpaid'
     });
 
     // Hashing the password
@@ -85,6 +87,7 @@ router.post('/login', (req, res) => {
           process.env.SECRET_OR_PRIVATE_KEY,
           { expiresIn: '24h' }
         );
+        sessionStorage.setItem('user-type', user.type);
         res
           .status(200)
           .json({ success: true, msg: 'login successful', user, token });
