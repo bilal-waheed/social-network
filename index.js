@@ -8,6 +8,7 @@ require('dotenv').config();
 const userRouter = require('./routes/users');
 const postRouter = require('./routes/posts');
 const paymentRouter = require('./routes/checkout');
+const moderatorRouter = require('./routes/moderator');
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(bodyParser.json());
 // router middlewares
 app.use('/api/users', userRouter);
 app.use('/api/posts', postRouter);
+app.use('/api/moderators', moderatorRouter);
 app.use('/', paymentRouter);
 
 // mongoDB connection
