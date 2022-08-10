@@ -1,14 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { init } = require('./socket');
+const { init } = require('./src/socketio/socket');
 require('dotenv').config();
 
 // router imports
-const userRouter = require('./routes/users');
-const postRouter = require('./routes/posts');
-const paymentRouter = require('./routes/checkout');
-const moderatorRouter = require('./routes/moderator');
+const userRouter = require('./src/routes/users');
+const postRouter = require('./src/routes/posts');
+const paymentRouter = require('./src/routes/checkout');
+const moderatorRouter = require('./src/routes/moderator');
 
 const app = express();
 

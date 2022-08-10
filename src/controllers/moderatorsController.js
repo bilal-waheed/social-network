@@ -1,17 +1,11 @@
-const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const authenticate = require('../middleware/jwtAuth');
 
 const { validateSignUpData, validateLoginData } = require('../validation/joi');
 const Post = require('../models/Post');
 const Moderator = require('../models/Moderator');
 
-const router = express.Router();
-
-// public route
-// sign up
-router.post('/signup', (req, res) => {
+const moderatorSignup = (req, res) => {
   Moderator.findOne({ username: req.body.username }).then((mod) => {
     if (mod) return res.status(400).json({ error: 'moderator already exists' });
 
@@ -60,11 +54,9 @@ router.post('/signup', (req, res) => {
       });
     });
   });
-});
+};
 
-// public route
-// log in
-router.post('/login', (req, res) => {
+const moderatorLogin = (req, res) => {
   // check if the moderator exists
   Moderator.findOne({ username: req.body.username }).then((mod) => {
     if (!mod) return res.status(404).json({ error: 'Moderator not found' });
@@ -90,9 +82,9 @@ router.post('/login', (req, res) => {
       }
     });
   });
-});
+};
 
-router.get('/posts', authenticate, (req, res) => {
+const getPosts = (req, res) => {
   Post.find()
     .then((posts) => {
       const mappedPosts = posts.map((post) => ({
@@ -106,6 +98,10 @@ router.get('/posts', authenticate, (req, res) => {
     .catch((err) => {
       res.status(500).json({ error: err });
     });
-});
+};
 
-module.exports = router;
+module.exports = {
+  moderatorSignup,
+  moderatorLogin,
+  getPosts
+};

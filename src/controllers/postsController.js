@@ -1,19 +1,12 @@
-const express = require('express');
 const sessionStorage = require('sessionstorage');
-
-const authenticate = require('../middleware/jwtAuth');
-const io = require('../socket');
 
 const Post = require('../models/Post');
 const User = require('../models/User');
-
-const router = express.Router();
+const io = require('../socketio/socket');
 
 const PER_PAGE_ITEMS = 2;
 
-// protected route
-// get the posts of authenticated user
-router.get('/all', authenticate, (req, res) => {
+const getAllPosts = (req, res) => {
   const { param, order, pageNumber } = req.body;
   if (!(param && order && pageNumber))
     return res.status(400).json({ error: 'Query parameters required.' });
@@ -47,11 +40,9 @@ router.get('/all', authenticate, (req, res) => {
           res.json(err);
         });
     });
-});
+};
 
-// protected route
-// create a post
-router.post('/create', authenticate, (req, res) => {
+const createPost = (req, res) => {
   if (!(req.body.title && req.body.content)) {
     return res.status(400).send('All fields are required');
   }
@@ -70,11 +61,9 @@ router.post('/create', authenticate, (req, res) => {
     .catch((err) => {
       res.json(err);
     });
-});
+};
 
-// protected route
-// get the feed
-router.get('/feed', authenticate, async (req, res) => {
+const getFeed = async (req, res) => {
   const { param, order, pageNumber } = req.body;
   if (!(param && order && pageNumber))
     return res.status(400).json({ error: 'Query parameters required.' });
@@ -118,11 +107,9 @@ router.get('/feed', authenticate, async (req, res) => {
           res.json(err);
         });
     });
-});
+};
 
-// protected route
-// update a post
-router.patch('/update/:id', authenticate, (req, res) => {
+const updatePost = (req, res) => {
   if (!req.body.id) return res.status(400).json({ error: 'Invalid post id' });
   Post.findOne({ _id: req.params.id })
     .then((post) => {
@@ -153,11 +140,9 @@ router.patch('/update/:id', authenticate, (req, res) => {
     .catch((err) => {
       res.status(500).json({ error: err });
     });
-});
+};
 
-// protected route
-// delete a user
-router.delete('/delete/:id', authenticate, (req, res) => {
+const deletePost = (req, res) => {
   Post.findOneAndDelete({ _id: req.params.id }).then((post) => {
     if (!post) return res.status(404).json({ error: 'Post does not exist' });
 
@@ -171,6 +156,12 @@ router.delete('/delete/:id', authenticate, (req, res) => {
       msg: 'Post deleted successfully'
     });
   });
-});
+};
 
-module.exports = router;
+module.exports = {
+  getAllPosts,
+  createPost,
+  getFeed,
+  updatePost,
+  deletePost
+};

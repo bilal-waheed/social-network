@@ -1,22 +1,13 @@
-const express = require('express');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const sessionStorage = require('sessionstorage');
-const authenticate = require('../middleware/jwtAuth');
 
 const User = require('../models/User');
 const Post = require('../models/Post');
-
 const { validateSignUpData, validateLoginData } = require('../validation/joi');
 
-const router = express.Router();
-
-// public route
-// sign up
-router.post('/signup', (req, res) => {
+const userSignUp = (req, res) => {
   User.findOne({ username: req.body.username }).then((user) => {
-    if (user) return res.status(400).json({ error: 'user already exists' });
-
     const { firstName, lastName, username, email, password } = req.body;
 
     const { value, error } = validateSignUpData({
@@ -49,6 +40,7 @@ router.post('/signup', (req, res) => {
         newUser
           .save()
           .then((userObj) => {
+            sessionStorage.setItem('user-type', userObj.type);
             const token = jwt.sign(
               { id: userObj.id },
               process.env.SECRET_OR_PRIVATE_KEY,
@@ -65,11 +57,9 @@ router.post('/signup', (req, res) => {
       });
     });
   });
-});
+};
 
-// public route
-// log in
-router.post('/login', (req, res) => {
+const userLogin = (req, res) => {
   // check if the user exists
   User.findOne({ username: req.body.username }).then((user) => {
     if (!user) return res.status(404).json({ error: 'User not found' });
@@ -96,11 +86,9 @@ router.post('/login', (req, res) => {
       }
     });
   });
-});
+};
 
-// protected route
-// update user
-router.patch('/update/:id', authenticate, (req, res) => {
+const userUpdate = (req, res) => {
   User.findOne({ _id: req.user.id })
     .then((user) => {
       if (!user)
@@ -108,7 +96,6 @@ router.patch('/update/:id', authenticate, (req, res) => {
           .status(404)
           .json({ error: 'User not found! Id is required' });
 
-      console.log(user.id, req.user.id);
       if (user.id !== req.user.id)
         return res.status(401).json({
           error: 'Unauthorized.'
@@ -150,11 +137,9 @@ router.patch('/update/:id', authenticate, (req, res) => {
     .catch((err) => {
       res.status(500).json({ error: err });
     });
-});
+};
 
-// protected route
-// delete a user
-router.delete('/delete/:id', authenticate, (req, res) => {
+const userDelete = (req, res) => {
   User.findOneAndDelete({ _id: req.user.id })
     .then(async (user) => {
       if (!user) return res.status(404).json({ error: 'User does not exist' });
@@ -178,11 +163,9 @@ router.delete('/delete/:id', authenticate, (req, res) => {
     .catch((err) => {
       res.status(500).json({ error: err });
     });
-});
+};
 
-// this is a protected route
-// follow a user
-router.patch('/follow-user/:id', authenticate, (req, res) => {
+const userFollow = (req, res) => {
   User.findOne({ _id: req.params.id })
     .then((userToFollow) => {
       if (!userToFollow)
@@ -219,11 +202,9 @@ router.patch('/follow-user/:id', authenticate, (req, res) => {
     .catch((err) => {
       res.status(500).json(err);
     });
-});
+};
 
-// this is a protected route
-// unfollow a user
-router.patch('/unfollow-user/:id', authenticate, (req, res) => {
+const userUnfollow = (req, res) => {
   User.findOne({ _id: req.params.id })
     .then((userToUnfollow) => {
       if (!userToUnfollow) res.status(404).json({ error: 'User not found' });
@@ -266,6 +247,13 @@ router.patch('/unfollow-user/:id', authenticate, (req, res) => {
     .catch((err) => {
       res.json(err);
     });
-});
+};
 
-module.exports = router;
+module.exports = {
+  userSignUp,
+  userLogin,
+  userUpdate,
+  userDelete,
+  userFollow,
+  userUnfollow
+};
