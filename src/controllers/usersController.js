@@ -42,7 +42,7 @@ const userSignUp = (req, res) => {
           .then((userObj) => {
             sessionStorage.setItem('user-type', userObj.type);
             const token = jwt.sign(
-              { id: userObj.id },
+              { id: userObj.id, userType: 'user' },
               process.env.SECRET_OR_PRIVATE_KEY,
               { expiresIn: '24h' }
             );
@@ -60,22 +60,22 @@ const userSignUp = (req, res) => {
 };
 
 const userLogin = (req, res) => {
+  const { username, password } = req.body;
+
+  const { value, error } = validateLoginData({ username, password });
+  if (error) return res.status(400).json(error.details[0].message);
+
   // check if the user exists
   User.findOne({ username: req.body.username }).then((user) => {
     if (!user) return res.status(404).json({ error: 'User not found' });
-
-    const { username, password } = req.body;
-
-    const { value, error } = validateLoginData({ username, password });
-    if (error) return res.status(400).json(error.details[0].message);
 
     // Comparing the password
     bcrypt.compare(password, user.password).then((isMatched) => {
       if (isMatched) {
         const token = jwt.sign(
-          { id: user.id },
+          { id: user.id, userType: 'user' },
           process.env.SECRET_OR_PRIVATE_KEY,
-          { expiresIn: '24h' }
+          { expiresIn: '7d' }
         );
         sessionStorage.setItem('user-type', user.type);
         res
@@ -142,12 +142,12 @@ const userUpdate = (req, res) => {
 const userDelete = (req, res) => {
   User.findOneAndDelete({ _id: req.user.id })
     .then(async (user) => {
-      if (!user) return res.status(404).json({ error: 'User does not exist' });
-
       if (user.id !== req.user.id)
         return res.status(401).json({
           error: 'Unauthorized.'
         });
+
+      if (!user) return res.status(404).json({ error: 'User does not exist' });
 
       try {
         const result = await Post.deleteMany({ createdBy: req.user.id });

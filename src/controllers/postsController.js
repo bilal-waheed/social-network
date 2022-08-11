@@ -74,7 +74,7 @@ const getFeed = async (req, res) => {
   orderSort[param] = order;
 
   const user = await User.findOne({ _id: userId });
-  if (sessionStorage.getItem('user-type') === 'unpaid')
+  if (user.type === 'unpaid')
     return res
       .status(401)
       .send(
@@ -110,7 +110,7 @@ const getFeed = async (req, res) => {
 };
 
 const updatePost = (req, res) => {
-  if (!req.body.id) return res.status(400).json({ error: 'Invalid post id' });
+  if (!req.params.id) return res.status(400).json({ error: 'Invalid post id' });
   Post.findOne({ _id: req.params.id })
     .then((post) => {
       if (!post) return res.status(404).json({ error: 'Post not found' });

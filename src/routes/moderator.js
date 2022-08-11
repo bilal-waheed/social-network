@@ -1,5 +1,6 @@
 const express = require('express');
 const authenticate = require('../middleware/jwtAuth');
+const checkForbidden = require('../middleware/forbidden');
 
 const {
   moderatorSignup,
@@ -9,10 +10,10 @@ const {
 
 const router = express.Router();
 
-router.post('/signup', moderatorSignup);
+router.post('/signup', checkForbidden, moderatorSignup);
 
-router.post('/login', moderatorLogin);
+router.post('/login', checkForbidden, moderatorLogin);
 
-router.get('/posts', authenticate, getPosts);
+router.get('/posts', authenticate, checkForbidden, getPosts);
 
 module.exports = router;

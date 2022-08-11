@@ -9,20 +9,14 @@ const signUpSchema = Joi.object({
 });
 
 const loginSchema = Joi.object({
-  userName: Joi.string().min(8).max(30),
-  password: Joi.string().min(6).max(15)
+  username: Joi.string().min(8).max(30).required(),
+  password: Joi.string().min(6).max(15).required()
 });
 
 const validateSignUpData = (signUpObject) =>
   signUpSchema.validate(signUpObject);
 
-const validateLoginData = (loginObject) => {
-  const { err, value } = loginSchema.validate(loginObject);
-  if (err) {
-    throw new Error(err);
-  }
-  return value;
-};
+const validateLoginData = (loginObject) => loginSchema.validate(loginObject);
 
 module.exports = {
   validateSignUpData,

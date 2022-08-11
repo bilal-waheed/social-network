@@ -39,7 +39,7 @@ const moderatorSignup = (req, res) => {
           .save()
           .then((modObj) => {
             const token = jwt.sign(
-              { id: modObj.id },
+              { id: modObj.id, userType: 'moderator' },
               process.env.SECRET_OR_PRIVATE_KEY,
               { expiresIn: '24h' }
             );
@@ -57,20 +57,20 @@ const moderatorSignup = (req, res) => {
 };
 
 const moderatorLogin = (req, res) => {
+  const { username, password } = req.body;
+
+  const { value, error } = validateLoginData({ username, password });
+  if (error) return res.status(400).json(error.details[0].message);
+
   // check if the moderator exists
   Moderator.findOne({ username: req.body.username }).then((mod) => {
     if (!mod) return res.status(404).json({ error: 'Moderator not found' });
-
-    const { username, password } = req.body;
-
-    const { value, error } = validateLoginData({ username, password });
-    if (error) return res.status(400).json(error.details[0].message);
 
     // Comparing the password
     bcrypt.compare(password, mod.password).then((isMatched) => {
       if (isMatched) {
         const token = jwt.sign(
-          { id: mod.id },
+          { id: mod.id, userType: 'moderator' },
           process.env.SECRET_OR_PRIVATE_KEY,
           { expiresIn: '24h' }
         );
@@ -84,19 +84,48 @@ const moderatorLogin = (req, res) => {
   });
 };
 
+const PER_PAGE_ITEMS = 4;
 const getPosts = (req, res) => {
+  const { param, order, pageNumber } = req.body;
+
+  if (!(param && order && pageNumber))
+    return res.status(400).json({ error: 'Query parameters required.' });
+
+  const orderSort = {};
+  orderSort[param] = order;
+  let postsCount;
+
   Post.find()
-    .then((posts) => {
-      const mappedPosts = posts.map((post) => ({
-        _id: post.id,
-        title: post.title,
-        content: post.content,
-        dateCreated: post.dateCreated
-      }));
-      res.status(200).json({ success: true, posts: mappedPosts });
-    })
-    .catch((err) => {
-      res.status(500).json({ error: err });
+    .count()
+    .then((count) => {
+      postsCount = count;
+      if (pageNumber * PER_PAGE_ITEMS >= postsCount + PER_PAGE_ITEMS)
+        return res.status(400).json({ error: 'Page does not exist' });
+      Post.find()
+        .sort(orderSort)
+        .skip((pageNumber - 1) * PER_PAGE_ITEMS)
+        .limit(PER_PAGE_ITEMS)
+        .then((posts) => {
+          if (!posts) return res.status(404).send('No posts found');
+
+          const mappedPosts = posts.map((post) => ({
+            _id: post.id,
+            title: post.title,
+            content: post.content,
+            dateCreated: post.dateCreated
+          }));
+          res.status(200).json({
+            success: true,
+            mappedPosts,
+            totalPosts: postsCount,
+            nextPage: parseInt(pageNumber, 10) + 1,
+            hasNextPage: pageNumber * PER_PAGE_ITEMS < postsCount,
+            hasPrevPage: pageNumber > 1
+          });
+        })
+        .catch((err) => {
+          res.json(err);
+        });
     });
 };
 
