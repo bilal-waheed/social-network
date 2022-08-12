@@ -7,7 +7,8 @@ const {
   userUpdate,
   userDelete,
   userFollow,
-  userUnfollow
+  userUnfollow,
+  userProfile
 } = require('../controllers/usersController');
 
 const router = express.Router();
@@ -15,6 +16,8 @@ const router = express.Router();
 router.post('/signup', userSignUp);
 
 router.post('/login', userLogin);
+
+router.get('/profile', authenticate, userProfile);
 
 router.patch('/update/', authenticate, userUpdate);
 

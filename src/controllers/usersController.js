@@ -88,6 +88,24 @@ const userLogin = (req, res) => {
   });
 };
 
+const userProfile = (req, res) => {
+  User.findOne({ _id: req.user.id })
+    .then((user) => {
+      res.status(200).json({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+        email: user.email,
+        type: user.type,
+        followers: user.followers,
+        following: user.following
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err });
+    });
+};
+
 const userUpdate = (req, res) => {
   User.findOne({ _id: req.user.id })
     .then((user) => {
@@ -252,6 +270,7 @@ const userUnfollow = (req, res) => {
 module.exports = {
   userSignUp,
   userLogin,
+  userProfile,
   userUpdate,
   userDelete,
   userFollow,
