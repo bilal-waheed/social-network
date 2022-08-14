@@ -17,6 +17,7 @@ const userSignUp = (req, res) => {
       email,
       password
     });
+
     if (error) return res.status(400).json(error.details[0].message);
 
     const newUser = new User({
@@ -33,19 +34,23 @@ const userSignUp = (req, res) => {
     // Hashing the password
     bcrypt.genSalt(10, (err, salt) => {
       if (err) throw err;
+
       bcrypt.hash(password, salt, (error, hash) => {
         if (error) throw error;
+
         newUser.password = hash;
 
         newUser
           .save()
           .then((userObj) => {
             sessionStorage.setItem('user-type', userObj.type);
+
             const token = jwt.sign(
               { id: userObj.id, userType: 'user' },
               process.env.SECRET_OR_PRIVATE_KEY,
               { expiresIn: '24h' }
             );
+
             res.status(201).json({
               success: true,
               msg: 'sign up successful',
@@ -77,7 +82,9 @@ const userLogin = (req, res) => {
           process.env.SECRET_OR_PRIVATE_KEY,
           { expiresIn: '7d' }
         );
+
         sessionStorage.setItem('user-type', user.type);
+
         res
           .status(200)
           .json({ success: true, msg: 'login successful', user, token });
@@ -132,8 +139,10 @@ const userUpdate = (req, res) => {
       if (value.password) {
         bcrypt.genSalt(10, (err, salt) => {
           if (err) throw err;
+
           bcrypt.hash(value.password, salt, (error, hash) => {
             if (error) throw error;
+
             user.password = hash;
           });
         });

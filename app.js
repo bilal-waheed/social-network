@@ -22,6 +22,10 @@ app.use('/api/posts', postRouter);
 app.use('/api/moderators', moderatorRouter);
 app.use('/', paymentRouter);
 
+app.get('*', (req, res) => {
+  res.status(404).send('Oops! Page does not exist');
+});
+
 // mongoDB connection
 mongoose.connect(process.env.MONGO_URI, (err) => {
   if (err) console.log(err);

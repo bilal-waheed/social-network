@@ -10,8 +10,8 @@ const getAllPosts = (req, res) => {
   const { param, order, pageNumber } = req.body;
   if (!(param && order && pageNumber))
     return res.status(400).json({ error: 'Query parameters required.' });
-  let postsCount;
 
+  let postsCount;
   const orderSort = {};
   orderSort[param] = order;
 
@@ -19,14 +19,17 @@ const getAllPosts = (req, res) => {
     .count()
     .then((count) => {
       postsCount = count;
+
       if (pageNumber * PER_PAGE_ITEMS >= postsCount + PER_PAGE_ITEMS)
         return res.status(400).json({ error: 'Page does not exist' });
+
       Post.find({ createdBy: req.user.id })
         .sort(orderSort)
         .skip((pageNumber - 1) * PER_PAGE_ITEMS)
         .limit(PER_PAGE_ITEMS)
         .then((posts) => {
           if (!posts) return res.status(404).send('No posts found');
+
           res.status(200).json({
             success: true,
             posts,
@@ -65,8 +68,10 @@ const createPost = (req, res) => {
 
 const getFeed = async (req, res) => {
   const { param, order, pageNumber } = req.body;
+
   if (!(param && order && pageNumber))
     return res.status(400).json({ error: 'Query parameters required.' });
+
   const userId = req.user.id;
   let postsCount;
 
@@ -80,20 +85,24 @@ const getFeed = async (req, res) => {
       .send(
         'Buy the subscription to view the feed. Go to {DOMAIN_NAME}/checkout'
       );
+
   const { following } = user;
 
   Post.find({ createdBy: { $in: following } })
     .count()
     .then((count) => {
       postsCount = count;
+
       if (pageNumber * PER_PAGE_ITEMS >= postsCount + PER_PAGE_ITEMS)
         return res.status(400).json({ error: 'Page does not exist' });
+
       Post.find({ createdBy: { $in: following } })
         .sort(orderSort)
         .skip((pageNumber - 1) * PER_PAGE_ITEMS)
         .limit(PER_PAGE_ITEMS)
         .then((posts) => {
           if (!posts) return res.status(404).send('No posts found');
+
           res.status(200).json({
             success: true,
             posts,
@@ -111,9 +120,11 @@ const getFeed = async (req, res) => {
 
 const updatePost = (req, res) => {
   if (!req.params.id) return res.status(400).json({ error: 'Invalid post id' });
+
   Post.findOne({ _id: req.params.id })
     .then((post) => {
       if (!post) return res.status(404).json({ error: 'Post not found' });
+
       if (post.createdBy !== req.user.id)
         return res
           .status(401)
@@ -127,6 +138,7 @@ const updatePost = (req, res) => {
         .save()
         .then((updatedPost) => {
           io.getIO().emit('posts', { message: 'A post updated', updatedPost });
+
           res.status(200).json({
             success: true,
             msg: 'Post updated successfully',

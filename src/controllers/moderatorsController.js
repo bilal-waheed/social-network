@@ -33,6 +33,7 @@ const moderatorSignup = (req, res) => {
       if (err) throw err;
       bcrypt.hash(password, salt, (error, hash) => {
         if (error) throw error;
+
         newMod.password = hash;
 
         newMod
@@ -43,6 +44,7 @@ const moderatorSignup = (req, res) => {
               process.env.SECRET_OR_PRIVATE_KEY,
               { expiresIn: '24h' }
             );
+
             res.status(201).json({
               success: true,
               msg: 'sign up successful',
@@ -91,16 +93,18 @@ const getPosts = (req, res) => {
   if (!(param && order && pageNumber))
     return res.status(400).json({ error: 'Query parameters required.' });
 
+  let postsCount;
   const orderSort = {};
   orderSort[param] = order;
-  let postsCount;
 
   Post.find()
     .count()
     .then((count) => {
       postsCount = count;
+
       if (pageNumber * PER_PAGE_ITEMS >= postsCount + PER_PAGE_ITEMS)
         return res.status(400).json({ error: 'Page does not exist' });
+
       Post.find()
         .sort(orderSort)
         .skip((pageNumber - 1) * PER_PAGE_ITEMS)
@@ -114,6 +118,7 @@ const getPosts = (req, res) => {
             content: post.content,
             dateCreated: post.dateCreated
           }));
+
           res.status(200).json({
             success: true,
             mappedPosts,
