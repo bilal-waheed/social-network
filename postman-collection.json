@@ -1,0 +1,1809 @@
+{
+	"info": {
+		"_postman_id": "cc4e709d-a24c-40b0-a396-5ce77881ee8b",
+		"name": "Social-Network",
+		"description": "This collection contains three folders containing related routes:\n\n1.  Users\n2.  Posts\n3.  Moderators\n4.  Checkout (single route)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "22609766"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "firstName",
+									"value": "postman",
+									"type": "text"
+								},
+								{
+									"key": "lastName",
+									"value": "user",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "postmanuser",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "postmanuser@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "123456",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:3000/api/users/signup",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"signup"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Signup",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "firstName",
+											"value": "postman",
+											"type": "text"
+										},
+										{
+											"key": "lastName",
+											"value": "user",
+											"type": "text"
+										},
+										{
+											"key": "username",
+											"value": "postmanuser",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "postmanuser@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "123456",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "localhost:3000/api/users/signup",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"users",
+										"signup"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "519"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"207-BGIbb44yXI8f080pd0yC2MAbEmc\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Aug 2022 15:34:58 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"msg\": \"sign up successful\",\n    \"userObj\": {\n        \"firstName\": \"postman\",\n        \"lastName\": \"user\",\n        \"username\": \"postmanuser\",\n        \"email\": \"postmanuser@gmail.com\",\n        \"password\": \"$2a$10$OzqH8XlHEVgfmOd3vGiWduVX1eIuUapereKPp0i4JuTx4CYURP2TC\",\n        \"followers\": [],\n        \"following\": [],\n        \"type\": \"unpaid\",\n        \"_id\": \"62f521a223afcc4042ce0fe1\",\n        \"__v\": 0\n    },\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyZjUyMWEyMjNhZmNjNDA0MmNlMGZlMSIsInVzZXJUeXBlIjoidXNlciIsImlhdCI6MTY2MDIzMjA5OCwiZXhwIjoxNjYwMzE4NDk4fQ.GOHxmfJloZLgJZ-AghvE7QPbBl6IIfuHqCmI3ltGkGI\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const resp = pm.response.json()",
+									"const token = resp.token;",
+									"pm.collectionVariables.set(\"token\", token);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "postmanuser",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "123456",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:3000/api/users/login",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "username",
+											"value": "postmanuser",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "123456",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "localhost:3000/api/users/login",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"users",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "514"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"202-gxMwHVFc+tROqQawGuRae7lCHx0\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Aug 2022 15:35:16 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"msg\": \"login successful\",\n    \"user\": {\n        \"_id\": \"62f521a223afcc4042ce0fe1\",\n        \"firstName\": \"postman\",\n        \"lastName\": \"user\",\n        \"username\": \"postmanuser\",\n        \"email\": \"postmanuser@gmail.com\",\n        \"password\": \"$2a$10$OzqH8XlHEVgfmOd3vGiWduVX1eIuUapereKPp0i4JuTx4CYURP2TC\",\n        \"followers\": [],\n        \"following\": [],\n        \"type\": \"unpaid\",\n        \"__v\": 0\n    },\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyZjUyMWEyMjNhZmNjNDA0MmNlMGZlMSIsInVzZXJUeXBlIjoidXNlciIsImlhdCI6MTY2MDIzMjExNiwiZXhwIjoxNjYwODM2OTE2fQ.w3Rsjfx61oVq0bAUOlhCqL5BGdf2MoolAy6Hh63LkYs\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": [
+						{
+							"name": "Get Profile",
+							"originalRequest": {
+								"method": "GET",
+								"header": []
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "298"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"12a-+bZkr/EQNRczxY6r0fgNfaKZxPs\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 12 Aug 2022 06:56:57 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"firstName\": \"bruce \",\n    \"lastName\": \"lee\",\n    \"username\": \"bruceleee\",\n    \"email\": \"brucelee@gmail.com\",\n    \"type\": \"unpaid\",\n    \"followers\": [\n        \"62ef7dd0601eb1a72c77355c\",\n        \"62ef7cf24e61c886c7cce2d2\",\n        \"62f34f4b738376c86d124706\",\n        \"62f351708ca9e4b722a711a8\",\n        \"62f352716cf5fd8787db99d8\",\n        \"62f521a223afcc4042ce0fe1\"\n    ],\n    \"following\": []\n}"
+						}
+					]
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "updatedpostmanuser",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:3000/api/users/update",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"update"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Update",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "username",
+											"value": "updatedpostmanuser",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "localhost:3000/api/users/update",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"users",
+										"update"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "324"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"144-weYcYnCz7KIqYP6RBZs83gs+Txs\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Aug 2022 15:35:45 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"msg\": \"User updated successfully\",\n    \"user\": {\n        \"_id\": \"62f521a223afcc4042ce0fe1\",\n        \"firstName\": \"postman\",\n        \"lastName\": \"user\",\n        \"username\": \"updatedpostmanuser\",\n        \"email\": \"postmanuser@gmail.com\",\n        \"password\": \"$2a$10$OzqH8XlHEVgfmOd3vGiWduVX1eIuUapereKPp0i4JuTx4CYURP2TC\",\n        \"followers\": [],\n        \"following\": [],\n        \"type\": \"unpaid\",\n        \"__v\": 0\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Follow",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/users/follow-user/62ef7c6c411a8b28e80803c6",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"follow-user",
+								"62ef7c6c411a8b28e80803c6"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Follow",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "localhost:3000/api/users/follow-user/62ef7c6c411a8b28e80803c6",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"users",
+										"follow-user",
+										"62ef7c6c411a8b28e80803c6"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "51"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"33-naXUFLCgwm8XpwfQeX0b/BibiPA\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Aug 2022 09:24:05 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"msg\": \"User followed successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Unfollow",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "localhost:3000/api/users/unfollow-user/62ef7c6c411a8b28e80803c6",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"unfollow-user",
+								"62ef7c6c411a8b28e80803c6"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Unfollow",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "localhost:3000/api/users/unfollow-user/62ef7c6c411a8b28e80803c6",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"users",
+										"unfollow-user",
+										"62ef7c6c411a8b28e80803c6"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "53"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"35-YQOX2Cl/9aKqteJU5va3NuXOSSE\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Aug 2022 09:33:48 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"msg\": \"User unfollowed successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/users/delete",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"delete"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Delete",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "localhost:3000/api/users/delete",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"users",
+										"delete"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "50"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"32-OFTq/K7EzIAzhbM+LNt6qpbIANA\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Aug 2022 09:38:07 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"msg\": \"User deleted successfully\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Following routes are included in this section:\n\n1.  User signup\n2.  User login\n3.  Follow user\n4.  Unfollow a user\n5.  Update a user\n6.  Delete a user"
+		},
+		{
+			"name": "Posts",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "new post title",
+									"type": "text"
+								},
+								{
+									"key": "content",
+									"value": "new post content",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:3000/api/posts/create",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"posts",
+								"create"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Create",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "title",
+											"value": "new post title",
+											"type": "text"
+										},
+										{
+											"key": "content",
+											"value": "new post content",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "localhost:3000/api/posts/create",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"posts",
+										"create"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "200"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"c8-4W1ALuX/Eg6awCp0TG6hJ6k9bMM\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Aug 2022 15:36:51 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"post\": {\n        \"title\": \"new post title\",\n        \"content\": \"new post content\",\n        \"createdBy\": \"62f521a223afcc4042ce0fe1\",\n        \"_id\": \"62f5221223afcc4042ce0fef\",\n        \"dateCreated\": \"2022-08-11T15:36:50.953Z\",\n        \"__v\": 0\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "new post updated title",
+									"type": "text"
+								},
+								{
+									"key": "content",
+									"value": "new post updated content",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:3000/api/posts/update/62f5221223afcc4042ce0fef",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"posts",
+								"update",
+								"62f5221223afcc4042ce0fef"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Update",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "title",
+											"value": "new post updated title",
+											"type": "text"
+										},
+										{
+											"key": "content",
+											"value": "new post updated content",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "localhost:3000/api/posts/update/62f5221223afcc4042ce0fef",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"posts",
+										"update",
+										"62f5221223afcc4042ce0fef"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "298"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"12a-KzaRANTN+VxZ9kKQTMS/3G4Oo48\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Aug 2022 15:37:27 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"msg\": \"Post updated successfully\",\n    \"updatedPost\": {\n        \"_id\": \"62f5221223afcc4042ce0fef\",\n        \"title\": \"new post updated title\",\n        \"content\": \"new post updated content\",\n        \"createdBy\": \"62f521a223afcc4042ce0fe1\",\n        \"dateCreated\": \"2022-08-11T15:36:50.953Z\",\n        \"__v\": 0,\n        \"lastUpdated\": \"2022-08-11T15:37:27.420Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/posts/delete/62f5221223afcc4042ce0fef",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"posts",
+								"delete",
+								"62f5221223afcc4042ce0fef"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Delete",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "localhost:3000/api/posts/delete/62f5221223afcc4042ce0fef",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"posts",
+										"delete",
+										"62f5221223afcc4042ce0fef"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "50"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"32-miRDCRtqqVBrJPB8mH5bhI2kRSQ\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Aug 2022 15:37:54 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"msg\": \"Post deleted successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "All Posts",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "pageNumber",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "param",
+									"value": "dateCreated",
+									"type": "text"
+								},
+								{
+									"key": "order",
+									"value": "-1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:3000/api/posts/all",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"posts",
+								"all"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "All Posts",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "pageNumber",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "param",
+											"value": "dateCreated",
+											"type": "text"
+										},
+										{
+											"key": "order",
+											"value": "-1",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "localhost:3000/api/posts/all",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"posts",
+										"all"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "448"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"1c0-Xi2iUlFo9yCh5EosKcBqzxnz09M\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Aug 2022 15:37:59 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"posts\": [\n        {\n            \"_id\": \"62f5221223afcc4042ce0fed\",\n            \"title\": \"new post title\",\n            \"content\": \"new post content\",\n            \"createdBy\": \"62f521a223afcc4042ce0fe1\",\n            \"dateCreated\": \"2022-08-11T15:36:50.329Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"62f5221123afcc4042ce0feb\",\n            \"title\": \"new post title\",\n            \"content\": \"new post content\",\n            \"createdBy\": \"62f521a223afcc4042ce0fe1\",\n            \"dateCreated\": \"2022-08-11T15:36:49.379Z\",\n            \"__v\": 0\n        }\n    ],\n    \"totalPosts\": 2,\n    \"nextPage\": 2,\n    \"hasNextPage\": false,\n    \"hasPrevPage\": false\n}"
+						}
+					]
+				},
+				{
+					"name": "Feed - Unsubscribed",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "pageNumber",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "param",
+									"value": "dateCreated",
+									"type": "text"
+								},
+								{
+									"key": "order",
+									"value": "-1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:3000/api/posts/feed",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"posts",
+								"feed"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Feed - Unsubscribed",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "pageNumber",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "param",
+											"value": "dateCreated",
+											"type": "text"
+										},
+										{
+											"key": "order",
+											"value": "-1",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "localhost:3000/api/posts/feed",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"posts",
+										"feed"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "html",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/html; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "67"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"43-dr8DRyqpVvLwkbf1/sioZanPnGo\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Aug 2022 15:38:36 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "Buy the subscription to view the feed. Go to {DOMAIN_NAME}/checkout"
+						}
+					]
+				},
+				{
+					"name": "Feed - Subscribed",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "pageNumber",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "param",
+									"value": "dateCreated",
+									"type": "text"
+								},
+								{
+									"key": "order",
+									"value": "-1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:3000/api/posts/feed",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"posts",
+								"feed"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Feed - Subscribed",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "pageNumber",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "param",
+											"value": "dateCreated",
+											"type": "text"
+										},
+										{
+											"key": "order",
+											"value": "-1",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "localhost:3000/api/posts/feed",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"posts",
+										"feed"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "471"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"1d7-QN6kz9dfTmQYoGbAvLTYrXfRU3E\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Aug 2022 15:39:15 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"posts\": [\n        {\n            \"_id\": \"62ef8046a4aa15c51cf2a112\",\n            \"title\": \"bruce lee post title\",\n            \"content\": \"bruce lee post content\",\n            \"createdBy\": \"62ef7c6c411a8b28e80803c6\",\n            \"dateCreated\": \"2022-08-07T09:05:10.602Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"62ef8045a4aa15c51cf2a110\",\n            \"title\": \"bruce lee post title\",\n            \"content\": \"bruce lee post content\",\n            \"createdBy\": \"62ef7c6c411a8b28e80803c6\",\n            \"dateCreated\": \"2022-08-07T09:05:09.942Z\",\n            \"__v\": 0\n        }\n    ],\n    \"totalPosts\": 3,\n    \"nextPage\": 2,\n    \"hasNextPage\": true,\n    \"hasPrevPage\": false\n}"
+						}
+					]
+				}
+			],
+			"description": "Following routes are included in this section.\n\n1.  Create a post\n2.  Update a post\n3.  Delete a post\n4.  Get all posts\n5.  Get the feed"
+		},
+		{
+			"name": "Moderators",
+			"item": [
+				{
+					"name": "Signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "firstName",
+									"value": "postman",
+									"type": "text"
+								},
+								{
+									"key": "lastName",
+									"value": "moderator",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "postmanmoderator",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "postmanmoderator@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "123456",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:3000/api/moderators/signup",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"moderators",
+								"signup"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Signup",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "firstName",
+											"value": "postman",
+											"type": "text"
+										},
+										{
+											"key": "lastName",
+											"value": "moderator",
+											"type": "text"
+										},
+										{
+											"key": "username",
+											"value": "postmanmoderator",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "postmanmoderator@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "123456",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "localhost:3000/api/moderators/signup",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"moderators",
+										"signup"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "463"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"1cf-YDwMQwuzKrAsoykDdw3+kMJqQQU\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Aug 2022 09:41:30 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"msg\": \"sign up successful\",\n    \"modObj\": {\n        \"firstName\": \"postman\",\n        \"lastName\": \"moderator\",\n        \"username\": \"postmanmoderator\",\n        \"email\": \"postmanmoderator@gmail.com\",\n        \"password\": \"$2a$10$vo9es.S0C5tNT2RHG8JmBO3G0BIbRu7dEjSUT8AplHfXCqWxRts0C\",\n        \"_id\": \"62f4ceca876affdb594b0515\",\n        \"__v\": 0\n    },\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyZjRjZWNhODc2YWZmZGI1OTRiMDUxNSIsImlhdCI6MTY2MDIxMDg5MCwiZXhwIjoxNjYwMjk3MjkwfQ.XXQ65r900x_d7HOB3BZ7GwGwnAWzPG0gmAJIo_oEGUc\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const resp = pm.response.json()",
+									"const token = resp.token;",
+									"console.log(token)",
+									"pm.collectionVariables.set(\"token\", token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "postmanmoderator",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "123456",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:3000/api/moderators/login",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"moderators",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "username",
+											"value": "postmanmoderator",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "123456",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "localhost:3000/api/moderators/login",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"moderators",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "458"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"1ca-xTyqA5XQhcSxlyZBkT5qjRo3QP0\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Aug 2022 09:43:28 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"msg\": \"login successful\",\n    \"mod\": {\n        \"_id\": \"62f4ceca876affdb594b0515\",\n        \"firstName\": \"postman\",\n        \"lastName\": \"moderator\",\n        \"username\": \"postmanmoderator\",\n        \"email\": \"postmanmoderator@gmail.com\",\n        \"password\": \"$2a$10$vo9es.S0C5tNT2RHG8JmBO3G0BIbRu7dEjSUT8AplHfXCqWxRts0C\",\n        \"__v\": 0\n    },\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyZjRjZWNhODc2YWZmZGI1OTRiMDUxNSIsImlhdCI6MTY2MDIxMTAwOCwiZXhwIjoxNjYwMjk3NDA4fQ.VuskxXXqz7ZUw6vAmaagSurBRhYt3UKXuwdtXsye3W0\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get All Posts",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "pageNumber",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "param",
+									"value": "dateCreated",
+									"type": "text"
+								},
+								{
+									"key": "order",
+									"value": "-1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:3000/api/moderators/posts",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"moderators",
+								"posts"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get All Posts",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "pageNumber",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "param",
+											"value": "dateCreated",
+											"type": "text"
+										},
+										{
+											"key": "order",
+											"value": "-1",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "localhost:3000/api/moderators/posts",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"moderators",
+										"posts"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "676"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"2a4-Ap5SS9EX9j995ErlL9qECZrPDCY\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Aug 2022 09:49:13 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"mappedPosts\": [\n        {\n            \"_id\": \"62f3aaf915e3171be5bbd602\",\n            \"title\": \"m cyrus post title  3\",\n            \"content\": \"m cyrus post content  3\",\n            \"dateCreated\": \"2022-08-10T12:56:25.898Z\"\n        },\n        {\n            \"_id\": \"62f3aad915e3171be5bbd600\",\n            \"title\": \"m cyrus post title  3\",\n            \"content\": \"m cyrus post content  3\",\n            \"dateCreated\": \"2022-08-10T12:55:53.302Z\"\n        },\n        {\n            \"_id\": \"62f3aa0715e3171be5bbd5fe\",\n            \"title\": \"m cyrus post title  3\",\n            \"content\": \"m cyrus post content  3\",\n            \"dateCreated\": \"2022-08-10T12:52:23.934Z\"\n        },\n        {\n            \"_id\": \"62f3aa0715e3171be5bbd5fc\",\n            \"title\": \"m cyrus post title  3\",\n            \"content\": \"m cyrus post content  3\",\n            \"dateCreated\": \"2022-08-10T12:52:23.123Z\"\n        }\n    ],\n    \"totalPosts\": 28,\n    \"nextPage\": 2,\n    \"hasNextPage\": true,\n    \"hasPrevPage\": false\n}"
+						}
+					]
+				}
+			],
+			"description": "Following routes are included in this section\n\n1.  Moderator signup\n2.  Moderator login\n3.  Get posts"
+		},
+		{
+			"name": "Checkout",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "email",
+							"value": "postmanuser@gmail.com",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:3000/checkout",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"checkout"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Checkout",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "postmanuser@gmail.com",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:3000/checkout",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"checkout"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "2423"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"977-okRVDAXE0G9MPyVkaJiw14FcNG8\""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 11 Aug 2022 15:39:06 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"message\": \"Payment successful\",\n    \"charge\": {\n        \"id\": \"ch_3LVdTSBup9Wthw4M389JAT7O\",\n        \"object\": \"charge\",\n        \"amount\": 50,\n        \"amount_captured\": 50,\n        \"amount_refunded\": 0,\n        \"application\": null,\n        \"application_fee\": null,\n        \"application_fee_amount\": null,\n        \"balance_transaction\": \"txn_3LVdTSBup9Wthw4M3BSJJbiX\",\n        \"billing_details\": {\n            \"address\": {\n                \"city\": null,\n                \"country\": null,\n                \"line1\": null,\n                \"line2\": null,\n                \"postal_code\": null,\n                \"state\": null\n            },\n            \"email\": null,\n            \"name\": null,\n            \"phone\": null\n        },\n        \"calculated_statement_descriptor\": \"Stripe\",\n        \"captured\": true,\n        \"created\": 1660232346,\n        \"currency\": \"usd\",\n        \"customer\": null,\n        \"description\": \"Feed payment\",\n        \"destination\": null,\n        \"dispute\": null,\n        \"disputed\": false,\n        \"failure_balance_transaction\": null,\n        \"failure_code\": null,\n        \"failure_message\": null,\n        \"fraud_details\": {},\n        \"invoice\": null,\n        \"livemode\": false,\n        \"metadata\": {},\n        \"on_behalf_of\": null,\n        \"order\": null,\n        \"outcome\": {\n            \"network_status\": \"approved_by_network\",\n            \"reason\": null,\n            \"risk_level\": \"normal\",\n            \"risk_score\": 3,\n            \"seller_message\": \"Payment complete.\",\n            \"type\": \"authorized\"\n        },\n        \"paid\": true,\n        \"payment_intent\": null,\n        \"payment_method\": \"card_1LVdTSBup9Wthw4MnBN3vwHX\",\n        \"payment_method_details\": {\n            \"card\": {\n                \"brand\": \"visa\",\n                \"checks\": {\n                    \"address_line1_check\": null,\n                    \"address_postal_code_check\": null,\n                    \"cvc_check\": null\n                },\n                \"country\": \"US\",\n                \"exp_month\": 8,\n                \"exp_year\": 2023,\n                \"fingerprint\": \"UbjjI1M2CJDBRlXx\",\n                \"funding\": \"credit\",\n                \"installments\": null,\n                \"last4\": \"4242\",\n                \"mandate\": null,\n                \"network\": \"visa\",\n                \"three_d_secure\": null,\n                \"wallet\": null\n            },\n            \"type\": \"card\"\n        },\n        \"receipt_email\": null,\n        \"receipt_number\": null,\n        \"receipt_url\": \"https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xTFRMSzRCdXA5V3RodzRNKJvF1JcGMgah6V9hgOI6LBbvYF0y3KhxNv2UzxG8BaSmOKlb451fGirBqHJThXdE3SAwie6tjiVX8-X5\",\n        \"refunded\": false,\n        \"refunds\": {\n            \"object\": \"list\",\n            \"data\": [],\n            \"has_more\": false,\n            \"total_count\": 0,\n            \"url\": \"/v1/charges/ch_3LVdTSBup9Wthw4M389JAT7O/refunds\"\n        },\n        \"review\": null,\n        \"shipping\": null,\n        \"source\": {\n            \"id\": \"card_1LVdTSBup9Wthw4MnBN3vwHX\",\n            \"object\": \"card\",\n            \"address_city\": null,\n            \"address_country\": null,\n            \"address_line1\": null,\n            \"address_line1_check\": null,\n            \"address_line2\": null,\n            \"address_state\": null,\n            \"address_zip\": null,\n            \"address_zip_check\": null,\n            \"brand\": \"Visa\",\n            \"country\": \"US\",\n            \"customer\": null,\n            \"cvc_check\": null,\n            \"dynamic_last4\": null,\n            \"exp_month\": 8,\n            \"exp_year\": 2023,\n            \"fingerprint\": \"UbjjI1M2CJDBRlXx\",\n            \"funding\": \"credit\",\n            \"last4\": \"4242\",\n            \"metadata\": {},\n            \"name\": null,\n            \"tokenization_method\": null\n        },\n        \"source_transfer\": null,\n        \"statement_descriptor\": null,\n        \"statement_descriptor_suffix\": null,\n        \"status\": \"succeeded\",\n        \"transfer_data\": null,\n        \"transfer_group\": null\n    }\n}"
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"const token = pm.variables.get(\"token\");",
+					"pm.request.headers.add({key: \"token\", value: token});",
+					"",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": ""
+		}
+	]
+}
