@@ -10,9 +10,9 @@ const {
 
 const router = express.Router();
 
-router.post('/signup', checkForbidden, moderatorSignup);
+router.post('/signup', moderatorSignup); // checkForbidden
 
-router.post('/login', checkForbidden, moderatorLogin);
+router.post('/login', moderatorLogin); // checkForbidden
 
 router.get('/posts', authenticate, checkForbidden, getPosts);
 

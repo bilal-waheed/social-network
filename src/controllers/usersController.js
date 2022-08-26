@@ -1,13 +1,17 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const sessionStorage = require('sessionstorage');
+const mongoose = require('mongoose');
 
 const User = require('../models/User');
 const Post = require('../models/Post');
 const { validateSignUpData, validateLoginData } = require('../validation/joi');
 
-const userSignUp = (req, res) => {
-  User.findOne({ username: req.body.username }).then((user) => {
+const userSignUp = async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.body.username });
+    if (user) return res.status(400).json({ error: 'user already exists' });
+
     const { firstName, lastName, username, email, password } = req.body;
 
     const { value, error } = validateSignUpData({
@@ -28,77 +32,81 @@ const userSignUp = (req, res) => {
       password,
       followers: [],
       following: [],
-      type: 'unpaid'
+      type: req.body.type ? req.body.type : 'unpaid'
     });
 
     // Hashing the password
     bcrypt.genSalt(10, (err, salt) => {
       if (err) throw err;
 
-      bcrypt.hash(password, salt, (error, hash) => {
+      bcrypt.hash(password, salt, async (error, hash) => {
         if (error) throw error;
 
         newUser.password = hash;
 
-        newUser
-          .save()
-          .then((userObj) => {
-            sessionStorage.setItem('user-type', userObj.type);
+        const userObj = await newUser.save();
 
-            const token = jwt.sign(
-              { id: userObj.id, userType: 'user' },
-              process.env.SECRET_OR_PRIVATE_KEY,
-              { expiresIn: '24h' }
-            );
+        sessionStorage.setItem('user-type', userObj.type);
 
-            res.status(201).json({
-              success: true,
-              msg: 'sign up successful',
-              userObj,
-              token
-            });
-          })
-          .catch((userErr) => res.status(500).json(userErr));
+        const token = jwt.sign(
+          { id: userObj.id, userType: 'user' },
+          process.env.SECRET_OR_PRIVATE_KEY,
+          { expiresIn: '24h' }
+        );
+
+        res.status(201).json({
+          success: true,
+          msg: 'sign up successful',
+          userObj,
+          token
+        });
       });
     });
-  });
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
 };
 
-const userLogin = (req, res) => {
-  const { username, password } = req.body;
+const userLogin = async (req, res) => {
+  try {
+    const { username, password } = req.body;
 
-  const { value, error } = validateLoginData({ username, password });
-  if (error) return res.status(400).json(error.details[0].message);
+    const { value, error } = validateLoginData({ username, password });
+    if (error) return res.status(400).json(error.details[0].message);
 
-  // check if the user exists
-  User.findOne({ username: req.body.username }).then((user) => {
+    // check if the user exists
+    const user = await User.findOne({ username: value.username });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     // Comparing the password
-    bcrypt.compare(password, user.password).then((isMatched) => {
-      if (isMatched) {
-        const token = jwt.sign(
-          { id: user.id, userType: 'user' },
-          process.env.SECRET_OR_PRIVATE_KEY,
-          { expiresIn: '7d' }
-        );
+    const isMatched = await bcrypt.compare(value.password, user.password);
 
-        sessionStorage.setItem('user-type', user.type);
+    if (isMatched) {
+      const token = jwt.sign(
+        { id: user.id, userType: 'user' },
+        process.env.SECRET_OR_PRIVATE_KEY,
+        { expiresIn: '7d' }
+      );
 
-        res
-          .status(200)
-          .json({ success: true, msg: 'login successful', user, token });
-      } else {
-        res.status(400).json({ error: 'password incorrect' });
-      }
-    });
-  });
+      sessionStorage.setItem('user-type', user.type);
+
+      res
+        .status(200)
+        .json({ success: true, msg: 'login successful', user, token });
+    } else {
+      res.status(400).json({ error: 'password incorrect' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
 };
 
-const userProfile = (req, res) => {
-  User.findOne({ _id: req.user.id })
-    .then((user) => {
-      res.status(200).json({
+const userProfile = async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.user.id });
+    res.status(200).json({
+      success: true,
+      user: {
         firstName: user.firstName,
         lastName: user.lastName,
         username: user.username,
@@ -106,174 +114,137 @@ const userProfile = (req, res) => {
         type: user.type,
         followers: user.followers,
         following: user.following
-      });
-    })
-    .catch((err) => {
-      res.status(500).json({ error: err });
-    });
-};
-
-const userUpdate = (req, res) => {
-  User.findOne({ _id: req.user.id })
-    .then((user) => {
-      if (!user)
-        return res
-          .status(404)
-          .json({ error: 'User not found! Id is required' });
-
-      if (user.id !== req.user.id)
-        return res.status(401).json({
-          error: 'Unauthorized.'
-        });
-
-      const { value, error } = validateSignUpData(req.body);
-
-      if (error) return res.status(400).json(error.details[0].message);
-
-      user.firstName = value.firstName ? value.firstName : user.firstName;
-      user.lastName = value.lastName ? value.lastName : user.lastName;
-      user.username = value.username ? value.username : user.username;
-      user.email = value.email ? value.email : user.email;
-
-      // re creating a hash for updated password
-      if (value.password) {
-        bcrypt.genSalt(10, (err, salt) => {
-          if (err) throw err;
-
-          bcrypt.hash(value.password, salt, (error, hash) => {
-            if (error) throw error;
-
-            user.password = hash;
-          });
-        });
       }
-
-      user
-        .save()
-        .then((updatedUser) =>
-          res.status(200).json({
-            success: true,
-            msg: 'User updated successfully',
-            user: updatedUser
-          })
-        )
-        .catch((err) => {
-          res.json({ error: err });
-        });
-    })
-    .catch((err) => {
-      res.status(500).json({ error: err });
     });
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
 };
 
-const userDelete = (req, res) => {
-  User.findOneAndDelete({ _id: req.user.id })
-    .then(async (user) => {
-      if (user.id !== req.user.id)
-        return res.status(401).json({
-          error: 'Unauthorized.'
+const userUpdate = async (req, res) => {
+  try {
+    // if (!req.user.id)
+    //   return res.status(401).json({
+    //     error: 'Unauthorized.'
+    //   });
+
+    const user = await User.findOne({ _id: req.user.id });
+    const { value, error } = validateSignUpData(req.body);
+
+    if (error) return res.status(400).json(error.details[0].message);
+
+    user.firstName = value.firstName ? value.firstName : user.firstName;
+    user.lastName = value.lastName ? value.lastName : user.lastName;
+    user.username = value.username ? value.username : user.username;
+    user.email = value.email ? value.email : user.email;
+
+    // re creating a hash for updated password
+    if (value.password) {
+      bcrypt.genSalt(10, (err, salt) => {
+        if (err) throw err;
+
+        bcrypt.hash(value.password, salt, (error, hash) => {
+          if (error) throw error;
+
+          user.password = hash;
         });
-
-      if (!user) return res.status(404).json({ error: 'User does not exist' });
-
-      try {
-        const result = await Post.deleteMany({ createdBy: req.user.id });
-
-        return res.status(200).json({
-          success: true,
-          msg: 'User deleted successfully'
-        });
-      } catch (err) {
-        throw new Error(err);
-      }
-    })
-    .catch((err) => {
-      res.status(500).json({ error: err });
-    });
-};
-
-const userFollow = (req, res) => {
-  User.findOne({ _id: req.params.id })
-    .then((userToFollow) => {
-      if (!userToFollow)
-        return res.status(404).json({ error: 'User not found' });
-
-      User.findOne({ _id: req.user.id }).then((user) => {
-        if (user.following.includes(req.params.id))
-          return res.json({ error: 'User already followed' });
-
-        user.following.push(req.params.id);
-        user
-          .save()
-          .then(() => {
-            User.findOne({ _id: req.params.id }).then((user) => {
-              user.followers.push(req.user.id);
-              user
-                .save()
-                .then(() => {
-                  res.status(200).json({
-                    success: true,
-                    msg: 'User followed successfully'
-                  });
-                })
-                .catch((err) => {
-                  res.status(500).json({ err });
-                });
-            });
-          })
-          .catch((err) => {
-            res.status(500).json({ err });
-          });
       });
-    })
-    .catch((err) => {
-      res.status(500).json(err);
+    }
+
+    const updatedUser = await user.save();
+    res.status(200).json({
+      success: true,
+      msg: 'User updated successfully',
+      user: updatedUser
     });
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
 };
 
-const userUnfollow = (req, res) => {
-  User.findOne({ _id: req.params.id })
-    .then((userToUnfollow) => {
-      if (!userToUnfollow) res.status(404).json({ error: 'User not found' });
+const userDelete = async (req, res) => {
+  try {
+    // if (!req.user.id)
+    //   return res.status(401).json({
+    //     error: 'Unauthorized.'
+    //   });
 
-      User.findOne({ _id: req.user.id }).then((user) => {
-        const indexOfUserFollowing = user.following.findIndex(
-          (id) => id === req.params.id
-        );
+    const user = await User.findOneAndDelete({ _id: req.user.id });
+    if (!user) return res.status(404).json({ error: 'User does not exist' });
 
-        if (indexOfUserFollowing === -1)
-          return res.status(404).json({ error: 'User not followed' });
+    const result = await Post.deleteMany({ createdBy: req.user.id });
 
-        user.following.splice(indexOfUserFollowing, 1);
-        user
-          .save()
-          .then(() => {
-            User.findOne({ _id: req.params.id }).then((user) => {
-              const indexToRemove = user.followers.findIndex(
-                (id) => id === req.user.id
-              );
-              user.followers.splice(indexToRemove, 1);
-              user
-                .save()
-                .then(() => {
-                  res.status(200).json({
-                    success: true,
-                    msg: 'User unfollowed successfully'
-                  });
-                })
-                .catch((err) => {
-                  res.status(500).json({ error: err });
-                });
-            });
-          })
-          .catch((err) => {
-            res.status(500).json({ error: err });
-          });
-      });
-    })
-    .catch((err) => {
-      res.json(err);
+    return res.status(200).json({
+      success: true,
+      msg: 'User deleted successfully'
     });
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+};
+
+const userFollow = async (req, res) => {
+  try {
+    const userToFollow = await User.findOne({ _id: req.params.id });
+
+    if (!userToFollow) return res.status(404).json({ error: 'User not found' });
+
+    const user = await User.findOne({ _id: req.user.id });
+
+    if (user.following.includes(req.params.id))
+      return res.json({ error: 'User already followed' });
+
+    user.following.push(req.params.id);
+
+    await user.save();
+
+    userToFollow.followers.push(req.user.id);
+
+    await userToFollow.save();
+
+    res.status(200).json({
+      success: true,
+      msg: 'User followed successfully'
+    });
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+};
+
+const userUnfollow = async (req, res) => {
+  try {
+    const userToUnfollow = await User.findOne({ _id: req.params.id });
+
+    if (!userToUnfollow) res.status(404).json({ error: 'User not found' });
+
+    const user = await User.findOne({ _id: req.user.id });
+
+    const indexOfUserFollowing = user.following.findIndex(
+      (id) => id === req.params.id
+    );
+
+    if (indexOfUserFollowing === -1)
+      return res.status(404).json({ error: 'User not followed' });
+
+    user.following.splice(indexOfUserFollowing, 1);
+
+    await user.save();
+
+    const indexToRemove = userToUnfollow.followers.findIndex(
+      (id) => id === req.user.id
+    );
+
+    userToUnfollow.followers.splice(indexToRemove, 1);
+
+    await userToUnfollow.save();
+
+    res.status(200).json({
+      success: true,
+      msg: 'User unfollowed successfully'
+    });
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
 };
 
 module.exports = {

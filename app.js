@@ -7,7 +7,7 @@ require('dotenv').config();
 // router imports
 const userRouter = require('./src/routes/users');
 const postRouter = require('./src/routes/posts');
-const paymentRouter = require('./src/routes/checkout');
+const { paymentRouter } = require('./src/routes/checkout');
 const moderatorRouter = require('./src/routes/moderator');
 
 const app = express();
@@ -27,10 +27,12 @@ app.get('*', (req, res) => {
 });
 
 // mongoDB connection
-mongoose.connect(process.env.MONGO_URI, (err) => {
-  if (err) console.log(err);
-  else console.log('Connected to DB successfully');
-});
+if (process.env.NODE_ENV === 'dev') {
+  mongoose.connect(process.env.MONGO_URI, (err) => {
+    if (err) console.log(err);
+    else console.log('Connected to DB successfully');
+  });
+}
 
 const server = app.listen(process.env.PORT, () => {
   console.log(`server running on port ${process.env.PORT}`);
@@ -39,3 +41,5 @@ const server = app.listen(process.env.PORT, () => {
     console.log('New client connected');
   });
 });
+
+module.exports = { app };
